@@ -21,7 +21,10 @@ public class AutorRepositoryTest {
         autor.setNome("Maria da Silva");
         autor.setNascionalidade("Brasileira");
         autor.setDataNascimento(LocalDate.of(1990, 1, 1));
-        autorRepository.save(autor);
+
+        org.junit.jupiter.api.Assertions.assertEquals("Maria da Silva", autor.getNome());
+        org.junit.jupiter.api.Assertions.assertEquals("Brasileira", autor.getNascionalidade());
+        org.junit.jupiter.api.Assertions.assertEquals(LocalDate.of(1990, 1, 1), autor.getDataNascimento());
     }
 
     @Test
