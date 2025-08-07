@@ -53,7 +53,6 @@ public class DatabaseConfiguration {
         config.setMaximumPoolSize(10); // maximo de conexoes liberadas
         config.setMinimumIdle(1); // tamanho inciial do pool
         config.setPoolName("library-db-pool");
-        config.setMaxLifetime(600000); // 10 minutos
         config.setConnectionTimeout(100000); // timeout para tentar conexao
         config.setConnectionTestQuery("select 1"); // query de teste
 
