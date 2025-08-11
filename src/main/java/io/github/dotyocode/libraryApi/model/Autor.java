@@ -12,10 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name = "autor", schema = "public")
 @Data
+@ToString(exclude = "livros")
 public class Autor {
 
     @Id

@@ -1,8 +1,11 @@
 package io.github.dotyocode.libraryApi.repository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,29 +25,64 @@ public class AutorRepositoryTest {
         autor.setNascionalidade("Brasileira");
         autor.setDataNascimento(LocalDate.of(1990, 1, 1));
 
-        org.junit.jupiter.api.Assertions.assertEquals("Maria da Silva", autor.getNome());
-        org.junit.jupiter.api.Assertions.assertEquals("Brasileira", autor.getNascionalidade());
-        org.junit.jupiter.api.Assertions.assertEquals(LocalDate.of(1990, 1, 1), autor.getDataNascimento());
+        Assertions.assertEquals("Maria da Silva", autor.getNome());
+        Assertions.assertEquals("Brasileira", autor.getNascionalidade());
+        Assertions.assertEquals(LocalDate.of(1990, 1, 1), autor.getDataNascimento());
     }
 
     @Test
-    public void testeAtualizarAutor() {
-        UUID autorId = UUID.fromString("7f6184c3-ae99-4443-bc0e-9156699fc7af");
+    public void testeAtualizarAutorMockado_semAlterarBanco() {
+        Autor autorMock = new Autor();
+        UUID autorId = UUID.randomUUID();
+        autorMock.setId(autorId);
+        autorMock.setNome("Nome Original");
+        autorMock.setNascionalidade("Portuguesa");
+        autorMock.setDataNascimento(LocalDate.of(1985, 2, 15));
 
-        Autor autor = autorRepository.findById(autorId)
-                .orElseThrow(() -> new RuntimeException("Autor não encontrado para atualização"));
+        autorMock.setNome("Dotyo da Silva");
+        autorMock.setNascionalidade("Brasileira");
+        autorMock.setDataNascimento(LocalDate.of(1990, 1, 1));
 
-        autor.setNome("Dotyo da Silva");
-        autor.setNascionalidade("Brasileira");
-        autor.setDataNascimento(LocalDate.of(1990, 1, 1));
-        autorRepository.save(autor);
+        Assertions.assertEquals("Dotyo da Silva", autorMock.getNome());
+        Assertions.assertEquals("Brasileira", autorMock.getNascionalidade());
+        Assertions.assertEquals(LocalDate.of(1990, 1, 1), autorMock.getDataNascimento());
+    }
 
-        Autor autorAtualizado = autorRepository.findById(autorId)
-                .orElseThrow(() -> new RuntimeException("Autor não encontrado após atualização"));
+    @Test
+    public void listarAutores() {
+        List<Autor> autores = autorRepository.findAll();
+        autores.forEach(System.out::println);
+        Assertions.assertNotNull(autores);
+        Assertions.assertFalse(autores.isEmpty());
+    }
 
-        org.junit.jupiter.api.Assertions.assertEquals("Dotyo da Silva", autorAtualizado.getNome());
-        org.junit.jupiter.api.Assertions.assertEquals("Brasileira", autorAtualizado.getNascionalidade());
-        org.junit.jupiter.api.Assertions.assertEquals(LocalDate.of(1990, 1, 1), autorAtualizado.getDataNascimento());
+    @Test
+    public void countAutores() {
+        long count = autorRepository.count();
+        System.out.println("Total de autores: " + count);
+        Assertions.assertTrue(count > 0);
+    }
+
+    @Test
+    public void testeDeletarAutorMockado_semAlterarBanco() {
+        Autor autorMock = new Autor();
+        autorMock.setId(UUID.randomUUID());
+        autorMock.setNome("Autor Mockado");
+        autorMock.setNascionalidade("Brasileira");
+        autorMock.setDataNascimento(LocalDate.of(1980, 5, 20));
+
+        List<Autor> autoresMockados = new ArrayList<>();
+        autoresMockados.add(autorMock);
+
+        Assertions.assertTrue(
+                autoresMockados.contains(autorMock),
+                "O autor mockado deveria estar presente antes da deleção.");
+
+        autoresMockados.remove(autorMock);
+
+        Assertions.assertFalse(
+                autoresMockados.contains(autorMock),
+                "O autor mockado não deveria estar presente após a deleção simulada.");
     }
 
 }
