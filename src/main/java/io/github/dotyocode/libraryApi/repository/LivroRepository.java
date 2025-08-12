@@ -42,4 +42,6 @@ public interface LivroRepository extends JpaRepository<Livro, UUID> {
         return livros;
     }
 
+    boolean existsByAutor(Autor autor);
+
 }

@@ -55,10 +55,16 @@ public class AutorController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deletarAutor(@PathVariable("id") String id) {
-        var idAutor = UUID.fromString(id);
-        autorService.deletar(idAutor);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> deletarAutor(@PathVariable("id") String id) {
+        try {
+            var idAutor = UUID.fromString(id);
+            var autor = autorService.obterPorId(idAutor);
+            autorService.deletar(autor);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            var erroDto = ErroResposta.conflitos(e.getMessage());
+            return ResponseEntity.status(erroDto.status()).body(erroDto);
+        }
     }
 
     @GetMapping

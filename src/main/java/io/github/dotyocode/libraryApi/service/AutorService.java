@@ -7,20 +7,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.dotyocode.libraryApi.exceptions.OperacaoNaoPermitidaException;
 import io.github.dotyocode.libraryApi.model.Autor;
 import io.github.dotyocode.libraryApi.repository.AutorRepository;
+import io.github.dotyocode.libraryApi.repository.LivroRepository;
 import io.github.dotyocode.libraryApi.validators.AutorValidator;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AutorService {
 
     private final AutorRepository autorRepository;
     private final AutorValidator autorValidator;
-
-    public AutorService(AutorRepository autorRepository, AutorValidator autorValidator) {
-        this.autorRepository = autorRepository;
-        this.autorValidator = autorValidator;
-    }
+    private final LivroRepository livroRepository;
 
     public Autor salvar(Autor autor) {
         autorValidator.validar(autor);
@@ -32,11 +32,16 @@ public class AutorService {
                 .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
     }
 
-    public void deletar(UUID id) {
-        if (!autorRepository.existsById(id)) {
+    public void deletar(Autor autor) {
+        if (possuiLivros(autor)) {
+            throw new OperacaoNaoPermitidaException(
+                    "Não é permitido excluir um Autor que possui livros vinculados");
+        }
+
+        if (!autorRepository.existsById(autor.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Autor não encontrado");
         }
-        autorRepository.deleteById(id);
+        autorRepository.deleteById(autor.getId());
     }
 
     public List<Autor> pesquisarAutores(String nome, String nascionalidade) {
@@ -79,6 +84,10 @@ public class AutorService {
         }
 
         return autorRepository.save(autorExistente);
+    }
+
+    public boolean possuiLivros(Autor autor) {
+        return livroRepository.existsByAutor(autor);
     }
 
 }
