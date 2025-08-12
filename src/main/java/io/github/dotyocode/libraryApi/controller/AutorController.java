@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.github.dotyocode.libraryApi.dto.AutorDto;
 import io.github.dotyocode.libraryApi.dto.ErroResposta;
 import io.github.dotyocode.libraryApi.service.AutorService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/autores")
@@ -30,7 +31,7 @@ public class AutorController {
     private AutorService autorService;
 
     @PostMapping
-    public ResponseEntity<Object> salvar(@RequestBody AutorDto autor) {
+    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDto autor) {
         try {
             var autorEntidade = autor.mapearParaAutor();
             var autorSalvo = autorService.salvar(autorEntidade);
@@ -78,7 +79,7 @@ public class AutorController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> atualizarAutor(@PathVariable("id") String id, @RequestBody AutorDto autor) {
+    public ResponseEntity<Object> atualizarAutor(@PathVariable("id") String id, @RequestBody @Valid AutorDto autor) {
         try {
             var idAutor = UUID.fromString(id);
             var autorEntidade = autor.mapearParaAutor();

@@ -3,6 +3,9 @@ package io.github.dotyocode.libraryApi.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -58,6 +61,17 @@ public class AutorService {
         }
 
         return autorRepository.findByNascionalidadeContainingIgnoreCase(nascionalidade);
+    }
+
+    public List<Autor> pesquisaByExample(String nome, String nascionalidade) {
+        var autor = new Autor();
+        autor.setNome(nome);
+        autor.setNascionalidade(nascionalidade);
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues().withIgnoreCase()
+                .withStringMatcher(StringMatcher.CONTAINING);
+
+        var autorExample = Example.of(autor, matcher);
+        return autorRepository.findAll(autorExample);
     }
 
     public boolean existsById(UUID id) {
