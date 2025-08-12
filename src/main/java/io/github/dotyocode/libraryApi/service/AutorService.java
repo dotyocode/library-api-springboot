@@ -9,17 +9,21 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.github.dotyocode.libraryApi.model.Autor;
 import io.github.dotyocode.libraryApi.repository.AutorRepository;
+import io.github.dotyocode.libraryApi.validators.AutorValidator;
 
 @Service
 public class AutorService {
 
     private final AutorRepository autorRepository;
+    private final AutorValidator autorValidator;
 
-    public AutorService(AutorRepository autorRepository) {
+    public AutorService(AutorRepository autorRepository, AutorValidator autorValidator) {
         this.autorRepository = autorRepository;
+        this.autorValidator = autorValidator;
     }
 
     public Autor salvar(Autor autor) {
+        autorValidator.validar(autor);
         return autorRepository.save(autor);
     }
 
@@ -56,6 +60,8 @@ public class AutorService {
     }
 
     public Autor atualizar(UUID id, Autor autor) {
+        autorValidator.validar(autor);
+
         if (!autorRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Autor não encontrado");
         }

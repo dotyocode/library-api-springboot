@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.dotyocode.libraryApi.dto.AutorDto;
+import io.github.dotyocode.libraryApi.dto.ErroResposta;
 import io.github.dotyocode.libraryApi.service.AutorService;
 
 @RestController
@@ -29,14 +30,20 @@ public class AutorController {
     private AutorService autorService;
 
     @PostMapping
-    public ResponseEntity<AutorDto> salvar(@RequestBody AutorDto autor) {
-        var autorEntidade = autor.mapearParaAutor();
-        var autorSalvo = autorService.salvar(autorEntidade);
+    public ResponseEntity<Object> salvar(@RequestBody AutorDto autor) {
+        try {
+            var autorEntidade = autor.mapearParaAutor();
+            var autorSalvo = autorService.salvar(autorEntidade);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(autorSalvo.getId())
-                .toUri();
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(autorSalvo.getId())
+                    .toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location).build();
+        } catch (Exception e) {
+            var erroDto = ErroResposta.conflitos(e.getMessage());
+            return ResponseEntity.status(erroDto.status()).body(erroDto);
+        }
     }
 
     @GetMapping("{id}")
@@ -65,12 +72,17 @@ public class AutorController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<AutorDto> atualizarAutor(@PathVariable("id") String id, @RequestBody AutorDto autor) {
-        var idAutor = UUID.fromString(id);
-        var autorEntidade = autor.mapearParaAutor();
-        var autorAtualizado = autorService.atualizar(idAutor, autorEntidade);
-        return ResponseEntity.ok(new AutorDto(autorAtualizado.getId(), autorAtualizado.getNome(),
-                autorAtualizado.getDataNascimento(), autorAtualizado.getNascionalidade()));
+    public ResponseEntity<Object> atualizarAutor(@PathVariable("id") String id, @RequestBody AutorDto autor) {
+        try {
+            var idAutor = UUID.fromString(id);
+            var autorEntidade = autor.mapearParaAutor();
+            var autorAtualizado = autorService.atualizar(idAutor, autorEntidade);
+            return ResponseEntity.ok(new AutorDto(autorAtualizado.getId(), autorAtualizado.getNome(),
+                    autorAtualizado.getDataNascimento(), autorAtualizado.getNascionalidade()));
+        } catch (Exception e) {
+            var erroDto = ErroResposta.conflitos(e.getMessage());
+            return ResponseEntity.status(erroDto.status()).body(erroDto);
+        }
     }
 
 }
