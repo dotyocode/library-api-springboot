@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.dotyocode.libraryApi.dto.AutorDto;
 import io.github.dotyocode.libraryApi.dto.ErroResposta;
+import io.github.dotyocode.libraryApi.mappers.AutorMapper;
 import io.github.dotyocode.libraryApi.service.AutorService;
 import jakarta.validation.Valid;
 
@@ -30,10 +31,13 @@ public class AutorController {
     @Autowired
     private AutorService autorService;
 
+    @Autowired
+    private AutorMapper autorMapper;
+
     @PostMapping
     public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDto autor) {
         try {
-            var autorEntidade = autor.mapearParaAutor();
+            var autorEntidade = autorMapper.toEntity(autor);
             var autorSalvo = autorService.salvar(autorEntidade);
 
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -84,8 +88,8 @@ public class AutorController {
             var idAutor = UUID.fromString(id);
             var autorEntidade = autor.mapearParaAutor();
             var autorAtualizado = autorService.atualizar(idAutor, autorEntidade);
-            return ResponseEntity.ok(new AutorDto(autorAtualizado.getId(), autorAtualizado.getNome(),
-                    autorAtualizado.getDataNascimento(), autorAtualizado.getNascionalidade()));
+            AutorDto autorDto = autorMapper.toDto(autorAtualizado);
+            return ResponseEntity.ok(autorDto);
         } catch (Exception e) {
             var erroDto = ErroResposta.conflitos(e.getMessage());
             return ResponseEntity.status(erroDto.status()).body(erroDto);
