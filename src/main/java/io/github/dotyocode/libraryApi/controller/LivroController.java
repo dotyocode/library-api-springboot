@@ -1,14 +1,15 @@
 package io.github.dotyocode.libraryApi.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,19 +63,29 @@ public class LivroController implements GenericController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PesquisaLivroDto>> pesquisar(
+    public ResponseEntity<Page<PesquisaLivroDto>> pesquisar(
             @RequestParam(value = "isbn", required = false) String isbn,
             @RequestParam(value = "titulo", required = false) String titulo,
             @RequestParam(value = "nome-autor", required = false) String nomeAutor,
             @RequestParam(value = "genero", required = false) GenerosLivros genero,
-            @RequestParam(value = "ano-publicacao", required = false) Integer anoPublicacao) {
+            @RequestParam(value = "ano-publicacao", required = false) Integer anoPublicacao,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "tamanho-pagina", defaultValue = "10") Integer tamanhoPagina) {
 
-        List<Livro> resultado = livroService.obterLivros(isbn, nomeAutor, anoPublicacao, genero);
-        List<PesquisaLivroDto> dtos = resultado.stream()
-                .map(livroMapper::toPesquisaDto)
-                .toList();
+        Page<Livro> paginaResultado = livroService.obterLivros(isbn, titulo, nomeAutor, anoPublicacao, genero, pagina,
+                tamanhoPagina);
+        Page<PesquisaLivroDto> resultado = paginaResultado.map(livroMapper::toPesquisaDto);
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Object> atualizar(@PathVariable("id") String id, @RequestBody @Valid CadastroLivroDto dto) {
+        Livro entidadeAuxiliar = livroMapper.toEntity(dto);
+        entidadeAuxiliar.setId(UUID.fromString(id));
+
+        livroService.atualizar(entidadeAuxiliar);
+        return ResponseEntity.noContent().build();
     }
 
 }

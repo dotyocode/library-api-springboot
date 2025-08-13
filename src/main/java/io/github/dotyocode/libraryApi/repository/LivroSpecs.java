@@ -15,6 +15,9 @@ public class LivroSpecs {
 
     public static Specification<Livro> autorLike(String autor) {
         return (root, query, criteriaBuilder) -> {
+            if (autor == null) {
+                return null;
+            }
             Join<Object, Object> joinAutor = root.join("autor", JoinType.INNER);
             return criteriaBuilder.like(criteriaBuilder.upper(joinAutor.get("nome")), "%" + autor.toUpperCase() + "%");
         };

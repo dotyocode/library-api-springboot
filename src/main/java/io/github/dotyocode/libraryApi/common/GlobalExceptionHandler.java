@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.github.dotyocode.libraryApi.dto.ErroCampo;
 import io.github.dotyocode.libraryApi.dto.ErroResposta;
+import io.github.dotyocode.libraryApi.exceptions.CampoInvalidoException;
 import io.github.dotyocode.libraryApi.exceptions.OperacaoNaoPermitidaException;
 import io.github.dotyocode.libraryApi.exceptions.RegistroDuplicadoException;
+import io.github.dotyocode.libraryApi.exceptions.RegistroNaoEncontradoException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
@@ -49,19 +51,23 @@ public class GlobalExceptionHandler {
         return ErroResposta.respostaPadrao(e.getMessage());
     }
 
-    // @ExceptionHandler(CampoInvalidoException.class)
-    // @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    // public ErroResposta handleCampoInvalidoException(CampoInvalidoException e) {
-    // return new ErroResposta(
-    // HttpStatus.UNPROCESSABLE_ENTITY.value(),
-    // "Erro de validação.",
-    // List.of(new ErroCampo(e.getCampo(), e.getMessage())));
-    // }
-
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErroResposta handleAccesDeniedException(AccessDeniedException e) {
         return new ErroResposta(HttpStatus.FORBIDDEN.value(), "Acesso Negado.", List.of());
+    }
+
+    @ExceptionHandler(RegistroNaoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErroResposta handleRegistroNaoEncontradoException(RegistroNaoEncontradoException e) {
+        return ErroResposta.notFound(e.getMessage());
+    }
+
+    @ExceptionHandler(CampoInvalidoException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErroResposta handleCampoInvalidoException(CampoInvalidoException e) {
+        return new ErroResposta(HttpStatus.UNPROCESSABLE_ENTITY.value(), "Erro de validação.",
+                List.of(new ErroCampo(e.getCampo(), e.getMessage())));
     }
 
     @ExceptionHandler(RuntimeException.class)
