@@ -25,7 +25,7 @@ public class CustomAuthentication implements Authentication {
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
         return usuario.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
