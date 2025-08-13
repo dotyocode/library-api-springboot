@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import io.github.dotyocode.libraryApi.domain.autor.model.Autor;
-import io.github.dotyocode.libraryApi.domain.autor.repository.AutorRepository;
+import io.github.dotyocode.libraryApi.model.entities.autor.Autor;
+import io.github.dotyocode.libraryApi.repository.autor.AutorRepository;
 
 @SpringBootTest
 public class AutorRepositoryTest {

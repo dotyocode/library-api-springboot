@@ -12,11 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.github.dotyocode.libraryApi.domain.autor.model.Autor;
-import io.github.dotyocode.libraryApi.domain.autor.repository.AutorRepository;
-import io.github.dotyocode.libraryApi.domain.livro.enums.GenerosLivros;
-import io.github.dotyocode.libraryApi.domain.livro.model.Livro;
-import io.github.dotyocode.libraryApi.domain.livro.repository.LivroRepository;
+import io.github.dotyocode.libraryApi.enums.livros.GenerosLivros;
+import io.github.dotyocode.libraryApi.model.entities.autor.Autor;
+import io.github.dotyocode.libraryApi.model.entities.livros.Livro;
+import io.github.dotyocode.libraryApi.repository.autor.AutorRepository;
+import io.github.dotyocode.libraryApi.repository.livro.LivroRepository;
 
 @SpringBootTest
 public class LivroRepositoryTest {
