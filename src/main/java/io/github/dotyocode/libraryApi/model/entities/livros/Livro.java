@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import io.github.dotyocode.libraryApi.enums.livros.GenerosLivros;
 import io.github.dotyocode.libraryApi.model.entities.autor.Autor;
+import io.github.dotyocode.libraryApi.model.entities.usuario.Usuario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -54,5 +55,9 @@ public class Livro {
             fetch = FetchType.EAGER)
     @JoinColumn(name = "id_autor", nullable = false)
     private Autor autor;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
 }

@@ -12,8 +12,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.github.dotyocode.libraryApi.common.exceptions.OperacaoNaoPermitidaException;
 import io.github.dotyocode.libraryApi.model.entities.autor.Autor;
+import io.github.dotyocode.libraryApi.model.entities.usuario.Usuario;
 import io.github.dotyocode.libraryApi.repository.autor.AutorRepository;
 import io.github.dotyocode.libraryApi.repository.livro.LivroRepository;
+import io.github.dotyocode.libraryApi.security.SecurityService;
 import io.github.dotyocode.libraryApi.validators.autor.AutorValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +26,12 @@ public class AutorService {
     private final AutorRepository autorRepository;
     private final AutorValidator autorValidator;
     private final LivroRepository livroRepository;
+    private final SecurityService securityService;
 
     public Autor salvar(Autor autor) {
         autorValidator.validar(autor);
+        Usuario usuario = securityService.obterUsuarioLogado();
+        autor.setUsuario(usuario);
         return autorRepository.save(autor);
     }
 

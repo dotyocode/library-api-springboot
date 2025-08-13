@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,36 +21,31 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.dotyocode.libraryApi.mappers.autor.AutorMapper;
 import io.github.dotyocode.libraryApi.model.dto.AutorDto;
-import io.github.dotyocode.libraryApi.model.dto.ErroResposta;
+import io.github.dotyocode.libraryApi.model.entities.autor.Autor;
 import io.github.dotyocode.libraryApi.services.autor.AutorService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/autores")
+@RequiredArgsConstructor
 public class AutorController {
 
-    @Autowired
-    private AutorService autorService;
+    private final AutorService autorService;
 
-    @Autowired
-    private AutorMapper autorMapper;
+    private final AutorMapper autorMapper;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDto autor) {
-        try {
-            var autorEntidade = autorMapper.toEntity(autor);
-            var autorSalvo = autorService.salvar(autorEntidade);
+    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDto autorDto, Authentication authentication) {
 
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                    .buildAndExpand(autorSalvo.getId())
-                    .toUri();
+        Autor autor = autorMapper.toEntity(autorDto);
+        var autorSalvo = autorService.salvar(autor);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(autorSalvo.getId())
+                .toUri();
 
-            return ResponseEntity.created(location).build();
-        } catch (Exception e) {
-            var erroDto = ErroResposta.conflitos(e.getMessage());
-            return ResponseEntity.status(erroDto.status()).body(erroDto);
-        }
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("{id}")
@@ -65,15 +60,12 @@ public class AutorController {
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deletarAutor(@PathVariable("id") String id) {
-        try {
-            var idAutor = UUID.fromString(id);
-            var autor = autorService.obterPorId(idAutor);
-            autorService.deletar(autor);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            var erroDto = ErroResposta.conflitos(e.getMessage());
-            return ResponseEntity.status(erroDto.status()).body(erroDto);
-        }
+
+        var idAutor = UUID.fromString(id);
+        var autor = autorService.obterPorId(idAutor);
+        autorService.deletar(autor);
+        return ResponseEntity.noContent().build();
+
     }
 
     @GetMapping
@@ -90,16 +82,13 @@ public class AutorController {
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> atualizarAutor(@PathVariable("id") String id, @RequestBody @Valid AutorDto autor) {
-        try {
-            var idAutor = UUID.fromString(id);
-            var autorEntidade = autor.mapearParaAutor();
-            var autorAtualizado = autorService.atualizar(idAutor, autorEntidade);
-            AutorDto autorDto = autorMapper.toDto(autorAtualizado);
-            return ResponseEntity.ok(autorDto);
-        } catch (Exception e) {
-            var erroDto = ErroResposta.conflitos(e.getMessage());
-            return ResponseEntity.status(erroDto.status()).body(erroDto);
-        }
+
+        var idAutor = UUID.fromString(id);
+        var autorEntidade = autor.mapearParaAutor();
+        var autorAtualizado = autorService.atualizar(idAutor, autorEntidade);
+        AutorDto autorDto = autorMapper.toDto(autorAtualizado);
+        return ResponseEntity.ok(autorDto);
+
     }
 
 }

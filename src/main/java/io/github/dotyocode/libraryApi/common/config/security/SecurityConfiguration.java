@@ -44,4 +44,5 @@ public class SecurityConfiguration {
 
         return new CustomUserDetailsService(usuarioService);
     }
+
 }

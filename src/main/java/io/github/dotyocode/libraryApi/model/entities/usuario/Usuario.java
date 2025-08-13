@@ -1,6 +1,7 @@
 package io.github.dotyocode.libraryApi.model.entities.usuario;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.Type;
 
@@ -18,8 +19,8 @@ import lombok.Data;
 @Data
 public class Usuario {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "login")
     private String login;

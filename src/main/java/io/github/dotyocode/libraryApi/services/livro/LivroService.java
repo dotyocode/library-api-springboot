@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import io.github.dotyocode.libraryApi.enums.livros.GenerosLivros;
 import io.github.dotyocode.libraryApi.model.entities.livros.Livro;
+import io.github.dotyocode.libraryApi.model.entities.usuario.Usuario;
 import io.github.dotyocode.libraryApi.repository.livro.LivroRepository;
 import io.github.dotyocode.libraryApi.repository.livro.LivroSpecs;
+import io.github.dotyocode.libraryApi.security.SecurityService;
 import io.github.dotyocode.libraryApi.validators.livro.LivroValidator;
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +24,12 @@ public class LivroService {
 
     private final LivroRepository livroRepository;
     private final LivroValidator livroValidator;
+    private final SecurityService securityService;
 
     public Livro salvaLivro(Livro livro) {
         livroValidator.validar(livro);
+        Usuario usuario = securityService.obterUsuarioLogado();
+        livro.setUsuario(usuario);
         return livroRepository.save(livro);
     }
 
