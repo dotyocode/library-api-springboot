@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import io.github.dotyocode.libraryApi.model.Autor;
 import io.github.dotyocode.libraryApi.model.Livro;
 
 @Repository
-public interface LivroRepository extends JpaRepository<Livro, UUID> {
+public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
     List<Livro> findByAutor(Autor autor);
 
     List<Livro> findByTituloContainingIgnoreCase(String titulo);
