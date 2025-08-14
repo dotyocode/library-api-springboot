@@ -16,16 +16,18 @@ Esta API permite o gerenciamento completo de uma biblioteca, incluindo cadastro 
 - **PostgreSQL 17**
 - **Thymeleaf**
 - **Lombok**
-- **MapStruct**
+- **MapStruct 1.6.3**
 - **Maven**
 - **Docker & Docker Compose**
+- **Bean Validation (Jakarta)**
 
 ## 🏗️ Arquitetura
 
-O projeto segue uma arquitetura em camadas:
+O projeto segue uma arquitetura em camadas bem estruturada:
 
 ```markdown:README.md
 <code_block_to_apply_changes_from>
+src/main/java/io
 ```
 
 src/main/java/io/github/dotyocode/libraryApi/
