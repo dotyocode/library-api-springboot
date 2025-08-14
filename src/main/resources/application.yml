@@ -1,10 +1,10 @@
 spring:
   application:
-    name: libraryApi
+    name: ${APP_NAME:libraryApi}
   datasource:
-    url: jdbc:postgresql://localhost:5432/library
-    username: postgres
-    password: 123456
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/library}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
@@ -17,6 +17,14 @@ spring:
       client:
         registration:
           google:
-            client-id: 398550364164-2fa2bsf4cjq81dt5abo6f2shtg4dbsgd.apps.googleusercontent.com
-            client-secret: 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
-            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  security:
+    default-password: ${DEFAULT_PASSWORD:123456}
+    jwt-secret: ${JWT_SECRET:mySecretKey123456789}

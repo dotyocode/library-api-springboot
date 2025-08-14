@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import io.github.dotyocode.libraryApi.security.CustomUserDetailsService;
+import io.github.dotyocode.libraryApi.security.LoginSocialSuccessHandler;
 import io.github.dotyocode.libraryApi.services.usuario.UsuarioService;
 import lombok.RequiredArgsConstructor;
 
@@ -27,17 +28,21 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LoginSocialSuccessHandler loginSocialSuccessHandler)
+            throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(Customizer.withDefaults())
+                .formLogin(
+                        configurer -> configurer.loginPage("/login").permitAll())
                 .authorizeHttpRequests(authz -> {
                     authz.requestMatchers("/login").permitAll();
                     authz.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
                     authz.anyRequest().authenticated();
                 })
                 .httpBasic(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .successHandler(loginSocialSuccessHandler))
                 .build();
     }
 

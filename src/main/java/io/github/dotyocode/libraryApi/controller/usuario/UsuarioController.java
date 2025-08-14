@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.dotyocode.libraryApi.mappers.usuario.UsuarioMapper;
 import io.github.dotyocode.libraryApi.model.dto.UsuarioDto;
 import io.github.dotyocode.libraryApi.services.usuario.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,7 +23,7 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void criarUsuario(@RequestBody UsuarioDto dto) {
+    public void criarUsuario(@RequestBody @Valid UsuarioDto dto) {
         var usuario = usuarioMapper.toEntity(dto);
         usuarioService.criarUsuario(usuario);
     }
