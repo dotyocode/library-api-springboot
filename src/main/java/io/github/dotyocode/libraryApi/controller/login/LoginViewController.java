@@ -3,6 +3,7 @@ package io.github.dotyocode.libraryApi.controller.login;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.github.dotyocode.libraryApi.security.CustomAuthentication;
@@ -22,5 +23,11 @@ public class LoginViewController {
             return "Olá, " + customAuth.getUsuario();
         }
         return "Olá, " + authentication.getName();
+    }
+
+    @GetMapping("/authorized")
+    @ResponseBody
+    public String getAuthorizationCode(@RequestParam("code") String code) {
+        return "Olá, seu autorization code: " + code;
     }
 }

@@ -58,10 +58,13 @@ public class AuthorizationServerConfiguration {
                 .build();
     }
 
+    /*
+     * Mude para false para Client Credentials
+     */
     @Bean
     public ClientSettings clientSettings() {
         return ClientSettings.builder()
-                .requireAuthorizationConsent(false) // Mude para false para Client Credentials
+                .requireAuthorizationConsent(false)
                 .build();
     }
 
