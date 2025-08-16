@@ -28,3 +28,24 @@ app:
   security:
     default-password: ${DEFAULT_PASSWORD:123456}
     jwt-secret: ${JWT_SECRET:mySecretKey123456789}
+
+#niveis de log
+#trace - mais detalhado (nao recomendado para producao)
+#debug - detalhado (nao recomendado para producao)
+#info - informativo (recomendado para producao)
+#warn - aviso (recomendado para producao)
+#error - erro (recomendado para producao)
+#fatal - fatal (recomendado para producao)
+
+logging:
+  file:
+    name: app.log
+  level:
+    root: warn
+    io:
+      github:
+        dotyocode:
+          libraryApi: trace
+    org:
+      springframework:
+        web: debug

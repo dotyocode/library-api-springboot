@@ -11,8 +11,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import io.github.dotyocode.libraryApi.security.JwtCustomAuthenticationFilter;
 import io.github.dotyocode.libraryApi.security.LoginSocialSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, LoginSocialSuccessHandler loginSocialSuccessHandler)
+    public SecurityFilterChain filterChain(HttpSecurity http, LoginSocialSuccessHandler loginSocialSuccessHandler,
+            JwtCustomAuthenticationFilter jwtCustomAuthenticationFilter)
             throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -39,6 +42,7 @@ public class SecurityConfiguration {
                         .loginPage("/login")
                         .successHandler(loginSocialSuccessHandler))
                 .oauth2ResourceServer(oauth2Rs -> oauth2Rs.jwt(Customizer.withDefaults()))
+                .addFilterAfter(jwtCustomAuthenticationFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 

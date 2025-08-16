@@ -42,7 +42,7 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
         return RegisteredClient
                 .withId(client.getId().toString())
                 .clientId(client.getClientId())
-                .clientSecret(client.getClientSecret()) // Já está criptografado no banco
+                .clientSecret(client.getClientSecret())
                 .redirectUri(client.getRedirectUri())
                 .scope(client.getScope())
                 .clientAuthenticationMethods(methods -> {
@@ -51,7 +51,7 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
                 })
                 .authorizationGrantTypes(grantTypes -> {
                     grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
-                    grantTypes.add(AuthorizationGrantType.CLIENT_CREDENTIALS); // Adicione esta linha
+                    grantTypes.add(AuthorizationGrantType.CLIENT_CREDENTIALS);
                     grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
                 })
                 .tokenSettings(tokenSettings)

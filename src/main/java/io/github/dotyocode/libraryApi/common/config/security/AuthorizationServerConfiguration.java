@@ -5,7 +5,9 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +16,19 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.JWKSet;
@@ -29,6 +36,8 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+
+import io.github.dotyocode.libraryApi.security.CustomAuthentication;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +64,7 @@ public class AuthorizationServerConfiguration {
         return TokenSettings.builder()
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
                 .accessTokenTimeToLive(Duration.ofHours(1))
+                .refreshTokenTimeToLive(Duration.ofHours(2))
                 .build();
     }
 
@@ -101,5 +111,36 @@ public class AuthorizationServerConfiguration {
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                .tokenEndpoint("/oauth2/token") // obtem token
+                .tokenIntrospectionEndpoint("/oauth2/introspect") // utilizado para consultar status do token
+                .tokenRevocationEndpoint("/oauth2/revoke") // utilizado para revogar token
+                .authorizationEndpoint("/oauth2/authorize") // obtem authorization code
+                .oidcUserInfoEndpoint("/oauth2/userinfo") // obtem informacoes do usuario
+                .jwkSetEndpoint("/oauth2/jwks") // obtem chaves publicas do token
+                .oidcLogoutEndpoint("/oauth2/logout") // utilizado para logout
+                .issuer("http://localhost:8080")
+                .build();
+    }
+
+    @Bean
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
+        return (context) -> {
+            var principal = context.getPrincipal();
+            if (principal instanceof CustomAuthentication authentication) {
+                OAuth2TokenType tipoToken = context.getTokenType();
+                if (tipoToken == OAuth2TokenType.ACCESS_TOKEN) {
+                    Collection<GrantedAuthority> authorities = authentication.getAuthorities();
+                    authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+                    var claims = context.getClaims();
+                    claims.claim("authorities", authorities);
+                    claims.claim("email", authentication.getUsuario().getEmail());
+                }
+            }
+        };
     }
 }
